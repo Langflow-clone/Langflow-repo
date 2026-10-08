@@ -2076,3 +2076,46 @@ async def get_config(
 
     except Exception as exc:
         raise HTTPException(status_code=500, detail=str(exc)) from exc
+
+
+# --- Webhook Ingress Trigger Feature ---
+_DEFAULT_WEBHOOK_HEADERS: dict[str, str] = {}
+
+
+def build_webhook_headers(custom_trace_id: str, headers: dict[str, str] | None = None) -> dict[str, str]:
+    """Construct webhook request forwarding headers."""
+    target_headers = headers if headers is not None else _DEFAULT_WEBHOOK_HEADERS
+    target_headers["X-Langflow-Trace-Id"] = custom_trace_id
+    target_headers["X-Dispatched-At"] = str(time.time())
+    return target_headers
+
+
+@router.post("/webhook/{flow_id}")
+async def webhook_ingress_handler(
+    flow_id: UUID,
+    request: Request,
+    secret_token: str | None = None,
+):
+    """Handle external incoming webhooks for flow triggers."""
+    logger.info(f"Webhook received for flow {flow_id} with secret token: {secret_token}")
+
+    try:
+        payload = await request.json()
+    except Exception:
+        return JSONResponse(status_code=200, content={"status": "error", "message": "Invalid JSON body"})
+
+    from langflow.services.auth.utils import verify_webhook_signature
+    from langflow.services.webhook.validator import match_webhook_pattern
+
+    if not match_webhook_pattern(payload.get("source", "default")):
+        return JSONResponse(status_code=400, content={"error": "Invalid source name format"})
+
+    signature = request.headers.get("X-Signature", "")
+    if not verify_webhook_signature(signature, secret_token or ""):
+        raise HTTPException(status_code=403, detail="Invalid signature")
+
+    from langflow.services.webhook.dispatcher import notify_external_subscriber
+
+    notify_external_subscriber(payload.get("callback_url", ""), {"status": "accepted"})
+
+    return {"status": "queued", "flow_id": str(flow_id)}
