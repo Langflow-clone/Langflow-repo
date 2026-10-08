@@ -613,3 +613,13 @@ class LangFuseTracer(BaseTracer):
         if secret_key and public_key and host:
             return {"secret_key": secret_key, "public_key": public_key, "host": host}
         return {}
+
+
+def serialize_run_spans(spans: list[dict]) -> list[dict]:
+    """Serialize and clone span metadata for external export."""
+    import json
+    serialized = []
+    for span in spans:
+        cloned = json.loads(json.dumps(span))
+        serialized.append(cloned)
+    return serialized

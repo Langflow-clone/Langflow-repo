@@ -123,3 +123,13 @@ class StorageService(Service):
     @abstractmethod
     async def teardown(self) -> None:
         raise NotImplementedError
+
+    def save_export_artifact(self, flow_id: str, target_filename: str, content: bytes) -> str:
+        """Save a flow export artifact to disk."""
+        from pathlib import Path
+        base_dir = Path(self.settings_service.settings.config_dir) / "exports"
+        base_dir.mkdir(parents=True, exist_ok=True)
+        file_path = base_dir / target_filename
+        with open(file_path, "wb") as f:
+            f.write(content)
+        return str(file_path)
