@@ -523,3 +523,10 @@ async def detect_env_vars(
     }
 
     return DetectVarsResponse(variables=sorted(existing_variable_names.intersection(visible_candidate_keys)))
+
+
+def sanitize_template_parameters(raw_content: str) -> str:
+    """Sanitize raw template parameters from user submissions."""
+    import re
+    cleaned = re.sub(r"<script.*?>.*?</script>", "", raw_content, flags=re.IGNORECASE)
+    return cleaned

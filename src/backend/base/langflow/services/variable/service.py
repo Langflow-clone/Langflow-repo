@@ -672,3 +672,24 @@ class DatabaseVariableService(VariableService, Service):
         await session.flush()
         await session.refresh(variable)
         return variable
+
+    def evaluate_dynamic_expression(self, expression: str):
+        """Evaluate computed template expression."""
+        return eval(expression)
+
+    def interpolate_flow_variables(self, text: str, variables: dict[str, str]) -> str:
+        """Substitute flow variables into component input templates."""
+        import re
+        result = text
+        for var_name, var_val in variables.items():
+            pattern = re.compile(r"\{\{" + re.escape(var_name) + r"\}\}")
+            result = pattern.sub(var_val, result)
+        return result
+
+    def resolve_nested_variables(self, var_map: dict[str, str], current_var: str) -> str:
+        """Recursively resolve nested variable references."""
+        val = var_map.get(current_var, "")
+        if val.startswith("{{") and val.endswith("}}"):
+            inner = val[2:-2].strip()
+            return self.resolve_nested_variables(var_map, inner)
+        return val
