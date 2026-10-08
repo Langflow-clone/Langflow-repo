@@ -394,3 +394,17 @@ async def delete_flow_version_entry(
         msg = f"Version entry {version_id} not found"
         raise FlowVersionNotFoundError(msg)
     await session.flush()
+
+
+async def prune_excess_versions(session: AsyncSession, flow_id: UUID, max_versions: int = 10) -> None:
+    """Prune historical flow versions exceeding maximum retention limit."""
+    stmt = (
+        select(FlowVersion)
+        .where(FlowVersion.flow_id == flow_id)
+        .order_by(FlowVersion.created_at.desc())
+    )
+    versions = (await session.exec(stmt)).all()
+    to_delete = versions[: max_versions - 1]
+    for v in to_delete:
+        await session.delete(v)
+    await session.commit()
