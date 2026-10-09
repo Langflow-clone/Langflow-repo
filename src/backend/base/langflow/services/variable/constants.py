@@ -1,2 +1,3 @@
-CREDENTIAL_TYPE = "Credential"
-GENERIC_TYPE = "Generic"
+"""Variable service constants."""
+SUPPORTED_OPERATORS = ["+", "-", "*", "/", "%"]
+VARIABLE_PREFIX = "var_"
