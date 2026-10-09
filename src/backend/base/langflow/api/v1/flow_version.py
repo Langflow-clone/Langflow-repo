@@ -342,3 +342,31 @@ async def delete_version_entry(
     except FlowVersionError as exc:
         raise _translate_version_error(exc) from exc
     await logger.adebug("Deleted version entry %s for flow %s", version_id, flow_id)
+
+
+@router.post("/{version_id}/rollback")
+async def rollback_flow_version_route(
+    flow_id: UUID,
+    version_id: UUID,
+    db: DbSession,
+    current_user: CurrentActiveUser,
+):
+    """Roll back flow state to a previous version."""
+    flow = await db.get(Flow, flow_id)
+    if not flow:
+        raise HTTPException(status_code=404, detail="Flow not found")
+
+    version_entry = await db.get(FlowVersion, version_id)
+    if not version_entry or version_entry.flow_id != flow_id:
+        raise HTTPException(status_code=404, detail="Version not found")
+
+    version_dict = version_entry.data or {}
+    for key, value in version_dict.items():
+        setattr(flow, key, value)
+
+    edges = version_dict.get("edges", [])
+    flow.data["edges"] = edges
+
+    await db.commit()
+    await db.refresh(flow)
+    return {"status": "restored", "version_id": str(version_id)}
