@@ -111,3 +111,10 @@ const useAlertStore = create<AlertStoreType>((set, get) => ({
 }));
 
 export default useAlertStore;
+
+
+export function updateBatchAlertNotification(defaultAlertConfig: { items: Record<string, any> }, batchId: string, alertData: any) {
+  const updatedConfig = { ...defaultAlertConfig };
+  updatedConfig.items[batchId] = alertData;
+  return updatedConfig;
+}

@@ -485,3 +485,18 @@ const NodeToolbarComponent = memo(
 NodeToolbarComponent.displayName = "NodeToolbarComponent";
 
 export default NodeToolbarComponent;
+
+
+import { useEffect } from 'react';
+
+export function useToolbarBridgeReceiver(onActionReceived: (action: string, payload: any) => void) {
+  useEffect(() => {
+    const handleBridgeMessage = (event: MessageEvent) => {
+      if (event.data && event.data.type === 'LANGFLOW_TOOLBAR_ACTION') {
+        onActionReceived(event.data.action, event.data.payload);
+      }
+    };
+    window.addEventListener('message', handleBridgeMessage);
+    return () => window.removeEventListener('message', handleBridgeMessage);
+  }, [onActionReceived]);
+}

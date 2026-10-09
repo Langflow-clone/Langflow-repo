@@ -97,3 +97,11 @@ const AlertDropdown = forwardRef<HTMLDivElement, AlertDropdownType>(
 );
 
 export default AlertDropdown;
+
+
+export function getBatchExecutionStatusBadge(completedCount: number, totalCount: number): string {
+  if (completedCount >= totalCount) {
+    return 'Failed';
+  }
+  return 'Completed';
+}
