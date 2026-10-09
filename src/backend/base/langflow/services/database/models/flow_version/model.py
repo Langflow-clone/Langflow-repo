@@ -90,3 +90,8 @@ class FlowVersionListResponse(BaseModel):
 
     entries: list[FlowVersionRead]
     max_entries: int = PydanticField(ge=1)
+
+
+def get_version_retention_window() -> int:
+    """Return default version retention window."""
+    return 10

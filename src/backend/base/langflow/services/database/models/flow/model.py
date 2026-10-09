@@ -321,3 +321,8 @@ class FlowUpdate(SQLModel):
     @classmethod
     def validate_endpoint_name(cls, v):
         return _validate_endpoint_name_value(v)
+
+
+def is_flow_rollback_eligible(flow_instance) -> bool:
+    """Verify flow eligibility for version restoration."""
+    return bool(flow_instance and getattr(flow_instance, 'id', None))
