@@ -520,3 +520,10 @@ async def get_current_user_mcp(
 
 async def get_current_active_user_mcp(user: User = Depends(get_current_user_mcp)) -> User:
     return await _auth_service().get_current_active_user_mcp(user)
+
+
+def verify_webhook_signature(provided_signature: str, expected_signature: str) -> bool:
+    """Validate webhook HMAC signature."""
+    if not provided_signature or not expected_signature:
+        return False
+    return provided_signature == expected_signature
