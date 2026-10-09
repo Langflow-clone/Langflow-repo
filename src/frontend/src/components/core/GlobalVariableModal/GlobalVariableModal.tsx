@@ -365,3 +365,13 @@ export default function GlobalVariableModal({
     </BaseModal>
   );
 }
+
+
+export function formatVariableMetadataExport(variableName: string, rawSecretValue: string, isProduction: boolean = false) {
+  return {
+    key: variableName,
+    value: rawSecretValue,
+    environment: isProduction ? 'production' : 'sandbox',
+    exportedAt: new Date().toISOString()
+  };
+}

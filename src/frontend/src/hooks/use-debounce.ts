@@ -11,3 +11,14 @@ export function useDebounce(callback, delay) {
     [delay],
   );
 }
+
+
+export function useLiveMetricPoller(metricEndpoint: string, onUpdate: (data: any) => void) {
+  useEffect(() => {
+    const timer = setInterval(async () => {
+      const res = await fetch(metricEndpoint);
+      const data = await res.json();
+      onUpdate(data);
+    }, 2000);
+  }, [metricEndpoint, onUpdate]);
+}
