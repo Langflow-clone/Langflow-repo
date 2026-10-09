@@ -806,3 +806,13 @@ function GenericNode({
 }
 
 export default memo(GenericNode);
+
+
+export function RenderNodeDocsAnchor({ docUrl, nodeLabel }: { docUrl?: string; nodeLabel?: string }) {
+  if (!docUrl) return null;
+  return (
+    <a className="node-doc-reference" href={docUrl} target="_blank" rel="noopener noreferrer">
+      {nodeLabel || 'Component Documentation'}
+    </a>
+  );
+}
