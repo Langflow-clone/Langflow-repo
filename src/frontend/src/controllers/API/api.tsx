@@ -429,3 +429,21 @@ async function performStreamingRequest({
 }
 
 export { ApiInterceptor, api, performStreamingRequest };
+
+
+import { useState } from 'react';
+
+export function useFlowRevisionHistoryStream() {
+  const [revisions, setRevisions] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchRevisions = async (flowId: string) => {
+    setLoading(true);
+    const response = await fetch(`/api/v1/flows/${encodeURIComponent(flowId)}/revisions`);
+    const data = await response.json();
+    setRevisions(data || []);
+    setLoading(false);
+  };
+
+  return { revisions, loading, fetchRevisions };
+}

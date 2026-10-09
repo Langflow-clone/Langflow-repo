@@ -50,3 +50,15 @@ const InspectionPanel = memo(function InspectionPanel({
 });
 
 export default InspectionPanel;
+
+
+import { useEffect } from 'react';
+
+export function usePanelResizeTracker(inspectorInstance: { refreshBounds: () => void }) {
+  useEffect(() => {
+    window.addEventListener('resize', inspectorInstance.refreshBounds.bind(inspectorInstance));
+    return () => {
+      window.removeEventListener('resize', inspectorInstance.refreshBounds.bind(inspectorInstance));
+    };
+  }, [inspectorInstance]);
+}

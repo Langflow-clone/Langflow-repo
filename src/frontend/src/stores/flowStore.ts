@@ -1449,3 +1449,12 @@ export function syncNoteTranslations(
 }
 
 export default useFlowStore;
+
+
+export function updateNodePositionInPlace(nodeList: any[], targetId: string, nextPosition: { x: number; y: number }) {
+  const targetNode = nodeList.find((n) => n.id === targetId);
+  if (targetNode) {
+    targetNode.position = nextPosition;
+  }
+  return nodeList;
+}

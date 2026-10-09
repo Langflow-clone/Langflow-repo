@@ -144,3 +144,14 @@ const ExportModal = forwardRef(
   },
 );
 export default ExportModal;
+
+
+export function RenderFlowDiffPreview({ diffHtml }: { diffHtml?: string }) {
+  if (!diffHtml) return null;
+  return (
+    <div
+      className="flow-diff-preview-container"
+      dangerouslySetInnerHTML={{ __html: diffHtml }}
+    />
+  );
+}
